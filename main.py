@@ -53,6 +53,8 @@ e1_df = pd.DataFrame([[200, 250, 300, 400, 800, 850, 600, 550, 600],
                       ["06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00"]]).T
 e1_df.columns = ["pick", "hour"]
 pick_tail = 0
+queue_df = pd.DataFrame("IDLE", columns=["06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00"], index=work_df.ID)
+
 for index in range(len(e1_df)):
     current_queue = []
     pick_current = 0
@@ -68,11 +70,12 @@ for index in range(len(e1_df)):
         proposed_df.sort_values(by="not pick", inplace=True)
         chosen = proposed_df.head(1)
         current_queue.append(chosen.ID.values[0])
+        queue_df.loc[chosen.ID.values[0], hour] = "Pick"
         pick_current += chosen.Pick.values[0]
 
     print(" QUEUE : %s " % current_queue)
     print(hour + ": " + str(pick_current))
-
+print(queue_df)
 
 print("E2")
 
@@ -80,6 +83,7 @@ e1_df = pd.DataFrame([[200, 250, 300, 400, 800, 850, 600, 550, 600],
                       [1000, 1000, 1000, 1000, 1000, 0, 0, 0, 2200],
                       ["06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00"]]).T
 e1_df.columns = ["pick", "pack", "hour"]
+queue_df = pd.DataFrame("IDLE", columns=["06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00"], index=work_df.ID)
 pick_tail = 500  # backlog incial
 pack_tail = 0
 for index in range(len(e1_df)):
@@ -101,6 +105,7 @@ for index in range(len(e1_df)):
         proposed_df.sort_values(by="not pick", inplace=True)
         chosen = proposed_df.head(1)
         current_queue.append(chosen.ID.values[0])
+        queue_df.loc[chosen.ID.values[0], hour] = "Pick"
         pick_current += chosen.Pick.values[0]
     excess = 0
     if pick_current > pick_goal:
@@ -115,6 +120,7 @@ for index in range(len(e1_df)):
         proposed_df.sort_values(by="not pack", inplace=True)
         chosen = proposed_df.head(1)
         current_queue.append(chosen.ID.values[0])
+        queue_df.loc[chosen.ID.values[0], hour] = "Pack"
         if excess > 0:
             pack_current += (chosen.Pick.values[0] + excess)
             excess = 0
@@ -123,7 +129,7 @@ for index in range(len(e1_df)):
 
     print(" QUEUE : %s " % current_queue)
     print(hour + " - pick: " + str(pick_current) + " - pack: " + str(pack_current))
-
+print(queue_df)
 
 
 print("E3")
@@ -133,6 +139,7 @@ e1_df = pd.DataFrame([[200, 250, 300, 400, 800, 850, 600, 550, 600],
                       [450, 450, 450, 200, 200, 200, 200, 200, 200],
                       ["06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00"]]).T
 e1_df.columns = ["pick", "pack", "receiving", "hour"]
+queue_df = pd.DataFrame("IDLE", columns=["06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00"], index=work_df.ID)
 pick_tail = 500  # backlog incial
 pack_tail = 0
 receiving_tail = 0
@@ -158,6 +165,7 @@ for index in range(len(e1_df)):
         proposed_df.sort_values(by="not pick", inplace=True)
         chosen = proposed_df.head(1)
         current_queue.append(chosen.ID.values[0])
+        queue_df.loc[chosen.ID.values[0], hour] = "Pick"
         pick_current += chosen.Pick.values[0]
     excess = 0
     if pick_current > pick_goal:
@@ -172,6 +180,7 @@ for index in range(len(e1_df)):
         proposed_df.sort_values(by="not pack", inplace=True)
         chosen = proposed_df.head(1)
         current_queue.append(chosen.ID.values[0])
+        queue_df.loc[chosen.ID.values[0], hour] = "Pack"
         if excess > 0:
             pack_current += (chosen.Pick.values[0] + excess)
             excess = 0
@@ -190,6 +199,7 @@ for index in range(len(e1_df)):
         proposed_df.sort_values(by="not receiving", inplace=True)
         chosen = proposed_df.head(1)
         current_queue.append(chosen.ID.values[0])
+        queue_df.loc[chosen.ID.values[0], hour] = "Rece."
         if excess > 0:
             receiving_current += (chosen.Receiving.values[0] + excess)
             excess = 0
@@ -197,3 +207,5 @@ for index in range(len(e1_df)):
             receiving_current += chosen.Receiving.values[0]
     print(" QUEUE : %s " % current_queue)
     print(hour + " - pick: " + str(pick_current) + " - pack: " + str(pack_current) + " - receiving: " + str(receiving_current))
+print(queue_df)
+
